@@ -1,4 +1,4 @@
-package com.lprates.receiver;
+package com.lprates;
 
 /**
  * Hello world!
