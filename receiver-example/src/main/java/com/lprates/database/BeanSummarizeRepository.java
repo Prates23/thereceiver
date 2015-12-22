@@ -11,7 +11,10 @@ import org.hibernate.cfg.Configuration;
 
 import com.lprates.bean.DummyBean;
 
+/**
+ */
 public class BeanSummarizeRepository {
+	public static final String TAG = BeanSummarizeRepository.class.getName();
 
 	private static SessionFactory sessionFactory;
 
@@ -19,7 +22,12 @@ public class BeanSummarizeRepository {
 		sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
 	}
 
+	/**
+	 * Method save.
+	 * @param dummyBeans Collection<DummyBean>
+	 */
 	public void save(Collection<DummyBean> dummyBeans) {
+		System.out.println(TAG + ": Storing " + dummyBeans.size() + " beans");
 		Session session = sessionFactory.openSession();
 
 		Map<Integer, Long> aggregatedDummies = new HashMap<>();
@@ -57,5 +65,6 @@ public class BeanSummarizeRepository {
 		} finally {
 			session.close();
 		}
+		System.out.println(TAG + ": Stored all beans");
 	}
 }

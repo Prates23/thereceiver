@@ -6,6 +6,7 @@ import com.lprates.receiver.TheReceiver;
 import java.util.Random;
 
 public class Sender implements Runnable {
+	private static final String TAG = Sender.class.getName();
 
     private TheReceiver receiver;
     private Random random;
@@ -39,9 +40,10 @@ public class Sender implements Runnable {
             try {
 				Thread.sleep(500);
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
+				// TODO AUTO-GENERATED CATCH BLOCK
 				e.printStackTrace();
 			}
         }
+        System.out.println(TAG + ": Sender \"" + Thread.currentThread().getName() + "\" has exited running loop.");
     }
 }

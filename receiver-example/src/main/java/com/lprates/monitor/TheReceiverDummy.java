@@ -8,13 +8,15 @@ import com.lprates.buffer.DoubleBuffer;
 import com.lprates.database.BeanSummarizeRepository;
 import com.lprates.receiver.TheReceiver;
 
+/**
+ */
 public class TheReceiverDummy extends TheReceiver {
 	private DoubleBuffer<DummyBean> doubleBuffer;
 
 	private BeanSummarizeRepository beanSummarizeRepository;
-	
-	private static final int FLUSH_LIMIT = 1000000000;
-	private static final int SAVE_TIMEOUT = 5000; // 20 sec
+
+	private static final int FLUSH_LIMIT = 1000000;
+	private static final int SAVE_TIMEOUT = 200000; // 20 sec
 
 	private boolean shutdown;
 	private long lastSaveTime;
@@ -23,10 +25,14 @@ public class TheReceiverDummy extends TheReceiver {
 		doubleBuffer = new DoubleBuffer<DummyBean>();
 		lastSaveTime = System.currentTimeMillis();
 		shutdown = false;
-		
+
 		beanSummarizeRepository = new BeanSummarizeRepository();
 	}
 
+	/**
+	 * Method handleMessage.
+	 * @param message DummyBean
+	 */
 	@Override
 	public void handleMessage(DummyBean message) {
 		if (!shutdown) {
@@ -39,12 +45,11 @@ public class TheReceiverDummy extends TheReceiver {
 
 	public void waitFilling() {
 
-		while (elapsedTime() < SAVE_TIMEOUT && doubleBuffer.getProducerQueue().size() < FLUSH_LIMIT) {
+		while (elapsedTime() < SAVE_TIMEOUT && doubleBuffer.getProducerQueue().size() < FLUSH_LIMIT && !shutdown) {
 			try {
 				synchronized (this) {
 					wait();
 				}
-
 			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
@@ -62,24 +67,41 @@ public class TheReceiverDummy extends TheReceiver {
 		lastSaveTime = System.currentTimeMillis();
 
 		beanSummarizeRepository.save(dummyBeans);
-		
+
 		System.out.println("Drain completed");
 	}
 
+	/**
+	 * Method elapsedTime.
+	 * @return long
+	 */
 	private long elapsedTime() {
 		return System.currentTimeMillis() - lastSaveTime;
 
 	}
-	
-	public void shutdown() {
-		shutdown = true;
 
+	public synchronized void shutdown() {
+		shutdown = true;
+		
 		Collection<DummyBean> dummyBeans = new ArrayList<>();
 
+		System.out.println("Draining consumer queue.");
 		doubleBuffer.getConsumerQueue().drainTo(dummyBeans);
+		System.out.println("Drained consumer queue");
+
+		System.out.println("Saving consumer data.");
 		beanSummarizeRepository.save(dummyBeans);
+		System.out.println("Saved consumer data.");
+
+		System.out.println("Draining producer queue.");
 		doubleBuffer.getProducerQueue().drainTo(dummyBeans);
+		System.out.println("Drained producer queue");
+
+		System.out.println("Saving producer data.");
 		beanSummarizeRepository.save(dummyBeans);
+		System.out.println("Saved producer data.");
+		
+		notify();
 	}
 
 }

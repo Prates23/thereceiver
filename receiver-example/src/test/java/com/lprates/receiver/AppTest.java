@@ -6,6 +6,8 @@ import junit.framework.TestSuite;
 
 /**
  * Unit test for simple App.
+ * @author luis.prates
+ * @version $Revision: 1.0 $
  */
 public class AppTest 
     extends TestCase
@@ -21,8 +23,8 @@ public class AppTest
     }
 
     /**
-     * @return the suite of tests being tested
-     */
+    
+     * @return the suite of tests being tested */
     public static Test suite()
     {
         return new TestSuite( AppTest.class );
