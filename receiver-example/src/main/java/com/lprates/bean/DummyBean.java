@@ -22,4 +22,9 @@ public class DummyBean {
 		this.value = value;
 	}
 
+	@Override
+	public String toString() {
+		return "DummyBean [id=" + id + ", value=" + value + "]";
+	}
+
 }
